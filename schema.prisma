@@ -1,0 +1,77 @@
+// datasource db defines the database connection settings.
+// It is configured for PostgreSQL and uses an environment variable for the connection URL.
+// The 'extensions' feature enables the use of PostgreSQL-specific data types.
+datasource db {
+  provider   = "postgresql"
+  url        = env("DATABASE_URL")
+}
+
+// generator db configures Prisma Client settings.
+// It is set up to use Prisma Client Python with asyncio interface and specific features.
+generator db {
+  provider             = "prisma-client-py"
+  interface            = "asyncio"
+  recursive_type_depth = 5
+  previewFeatures      = ["postgresqlExtensions"]
+}
+
+model User {
+  id        String   @id @default(dbgenerated("gen_random_uuid()"))
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  username  String   @unique
+  role      UserRole @default(API_USER)
+
+  Messages Message[]
+}
+
+model Message {
+  id        String   @id @default(dbgenerated("gen_random_uuid()"))
+  createdAt DateTime @default(now())
+  content   String
+  response  String
+  userId    String
+
+  User User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Module {
+  id          String   @id @default(dbgenerated("gen_random_uuid()"))
+  createdAt   DateTime @default(now())
+  name        String
+  description String
+  enabled     Boolean  @default(true)
+
+  ModuleRoles ModuleRole[]
+  Feature     Feature[]
+}
+
+model ModuleRole {
+  id        String   @id @default(dbgenerated("gen_random_uuid()"))
+  createdAt DateTime @default(now())
+  moduleId  String
+  role      UserRole
+
+  Module Module @relation(fields: [moduleId], references: [id], onDelete: Cascade)
+}
+
+model Feature {
+  id          String  @id @default(dbgenerated("gen_random_uuid()"))
+  name        String
+  description String
+  active      Boolean @default(true)
+  moduleId    String
+
+  Module Module @relation(fields: [moduleId], references: [id], onDelete: Cascade)
+}
+
+enum UserRole {
+  API_USER
+  SYSTEM_ADMIN
+}
+
+enum ModuleType {
+  API
+  SECURITY
+}
+

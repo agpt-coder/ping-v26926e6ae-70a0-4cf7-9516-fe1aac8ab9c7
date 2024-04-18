@@ -1,0 +1,20 @@
+[tool.poetry]
+name = "ping-v2"
+version = "0.1.0"
+description = "single endpoint server that just replies with the pong: and the users message"
+authors = ["AutoGPT <info@agpt.co>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = ">=3.11"
+bcrypt = "^3.2.0"
+fastapi = "*"
+prisma = "*"
+pydantic = "*"
+python-jose = "^3.3.0"
+uvicorn = "*"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
